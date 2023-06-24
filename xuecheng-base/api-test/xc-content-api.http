@@ -1,0 +1,11 @@
+### 查询课程信息
+POST http://localhost:63040/content/course/list?pageNo=1&pageSize=2
+Content-Type: application/json
+
+{
+  "auditStatus": "202004",
+  "courseName": "java",
+  "publishStatus": ""
+}
+
+<> 2023-06-24T231221.200.json

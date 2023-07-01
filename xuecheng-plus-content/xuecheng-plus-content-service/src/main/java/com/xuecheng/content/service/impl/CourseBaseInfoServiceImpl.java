@@ -6,13 +6,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.mapper.CourseBaseMapper;
+import com.xuecheng.content.mapper.CourseCategoryMapper;
+import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.model.dto.AddCourseDto;
+import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.CourseCategory;
+import com.xuecheng.content.model.po.CourseMarket;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,6 +39,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Autowired
     CourseBaseMapper courseBaseMapper;
+
+    @Autowired
+    CourseMarketMapper courseMarketMapper;
+
+    @Autowired
+    CourseCategoryMapper courseCategoryMapper;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -53,4 +68,131 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         PageResult<CourseBase> courseBasePageResult = new PageResult<>(records, counts, pageParams.getPageNo(), pageParams.getPageSize());
         return courseBasePageResult;
     }
+
+    @Override
+    @Transactional // 加事务控制
+    // 实现创建课程的接口
+    public CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto) {
+
+        // 参数合法性校验
+        // @TODO 后期通过加参数的方式，实现参数合法性校验
+        if (StringUtils.isBlank(addCourseDto.getName())) {
+            throw new RuntimeException("课程名称为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getMt())) {
+            throw new RuntimeException("课程分类为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getSt())) {
+            throw new RuntimeException("课程分类为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getGrade())) {
+            throw new RuntimeException("课程等级为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getTeachmode())) {
+            throw new RuntimeException("教育模式为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getUsers())) {
+            throw new RuntimeException("适应人群为空");
+        }
+
+        if (StringUtils.isBlank(addCourseDto.getCharge())) {
+            throw new RuntimeException("收费规则为空");
+        }
+
+        // 向课程基本信息表写入数据 course_base
+        CourseBase courseBase = new CourseBase();
+        // 将传入的页面参数放到CourseBase对象里
+        // 利用工具从原始对象中提取部分对象存进对象
+        BeanUtils.copyProperties(addCourseDto, courseBase); // 自动匹配对象（属性名相同）， 原始对象空，新对象有值会覆盖！！
+        courseBase.setCompanyId(companyId); // 敏感数据去覆盖前面写好的数据
+        courseBase.setCreateDate(LocalDateTime.now());
+        // 默认审核状态
+        courseBase.setAuditStatus("202002");
+        // 发布状态
+        courseBase.setStatus("203001");
+        // 插入数据库
+        int insertToCourseBase = courseBaseMapper.insert(courseBase);
+        if( insertToCourseBase <= 0 ) throw new RuntimeException("添加课程信息失败");
+
+        // 像课程营销表写入数据 course_market
+        CourseMarket courseMarket = new CourseMarket();
+        // 将数据拷贝到营销信息模型中
+        BeanUtils.copyProperties(addCourseDto, courseMarket);
+        // 获取课程的主键ID
+        Long id = courseBase.getId();
+        courseMarket.setId(id);
+        // 写入或更新课程营销信息到数据库
+        int insertToCourseMarket = saveCourseMarketInfo(courseMarket);
+        if( insertToCourseMarket <= 0 ) throw new RuntimeException("课程营销信息插入失败");
+        //从数据库中查询课程信息
+        CourseBaseInfoDto courseBaseInfoDto = getCourseBaseInfo(id);
+        if(courseBaseInfoDto == null) throw new RuntimeException("查询课程信息失败");
+        else return courseBaseInfoDto;
+    }
+
+    // 保存营销信息， 逻辑：存在即更新，不存在就创建
+    private int saveCourseMarketInfo(CourseMarket courseMarket){
+
+
+        // 检验参数合法性
+        String charge = courseMarket.getCharge();
+        if(StringUtils.isBlank(charge)){
+            throw new RuntimeException("收费规则为空");
+        }
+
+        // 如果选了收费，但是没有价格的话
+        if(charge.equals("201001")){
+            if(courseMarket.getPrice() == null || courseMarket.getPrice().floatValue() <= 0){
+                throw new RuntimeException("课程价格不能为空且必须大于0");
+            }
+        }
+
+        // 从数据库中查营销信息，有更新无创建
+        Long id = courseMarket.getId();
+        CourseMarket courseMarket1 = courseMarketMapper.selectById(id);
+        if(courseMarket1 == null){
+            // 插入数据库
+            return courseMarketMapper.insert(courseMarket);
+        }else{
+            // 数据库存在该课程需要更新
+            BeanUtils.copyProperties(courseMarket, courseMarket1);
+            courseMarket1.setId(courseMarket.getId());
+            // 更新
+            return courseMarketMapper.updateById(courseMarket1);
+        }
+    }
+
+    // 获取课程详细信息， 包括两部分
+    private CourseBaseInfoDto getCourseBaseInfo(long courseId){
+
+        // 从课程信息表查询
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase == null){
+            return null;
+        }
+
+        // 从课程营销表查询
+        CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
+
+        // 组装
+        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+        BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
+        if(courseMarket!=null){
+            BeanUtils.copyProperties(courseMarket, courseBaseInfoDto);
+        }
+        // 缺少分类类名，查数据库
+        String bidCategoryId = courseBaseInfoDto.getMt();
+        String smallCategoryId = courseBaseInfoDto.getSt();
+        CourseCategory bigCategoryName = courseCategoryMapper.selectById(bidCategoryId);
+        CourseCategory smallCategoryName = courseCategoryMapper.selectById(smallCategoryId);
+        courseBaseInfoDto.setMtName(bigCategoryName.getName());
+        courseBaseInfoDto.setStName(smallCategoryName.getName());
+        return courseBaseInfoDto;
+    }
+
 }

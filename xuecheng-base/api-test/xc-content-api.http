@@ -9,3 +9,6 @@ Content-Type: application/json
 }
 
 <> 2023-06-24T231221.200.json
+
+### 查询课程分类
+GET {{content_host}}/content/course-category/tree-nodes

@@ -1,8 +1,17 @@
 package com.xuecheng.base.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -27,8 +36,7 @@ public class GlobalExceptionHandler {
 
         // 解析异常信息
         String errMessage = exception.getErrMessage();
-        RestErrorResponse restErrorResponse = new RestErrorResponse(errMessage);
-        return restErrorResponse;
+        return new RestErrorResponse(errMessage);
 
     }
 
@@ -43,8 +51,31 @@ public class GlobalExceptionHandler {
 
         // 解析异常信息
         // 系统异常统一为执行过程异常，默认错误
-        RestErrorResponse restErrorResponse = new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
-        return restErrorResponse;
+        return new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
+
+    }
+
+    // 验证异常数据解析 （JSR303）
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public RestErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException exception){
+
+        List<String> errors = new ArrayList<>();
+        BindingResult bindingResult = exception.getBindingResult();
+        bindingResult.getFieldErrors().stream().forEach(item->{
+            errors.add(item.getDefaultMessage());
+        });
+
+        // 将list当中的错误信息拼接
+        String errorMessage = StringUtils.join(errors, ",");
+
+        // 记录异常
+        log.error("系统异常{}", exception.getMessage(), errorMessage);
+
+        // 解析异常信息
+        // 系统异常统一为执行过程异常，默认错误
+        return new RestErrorResponse(errorMessage);
 
     }
 

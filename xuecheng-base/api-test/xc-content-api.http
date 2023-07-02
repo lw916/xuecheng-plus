@@ -29,7 +29,7 @@ Content-Type: application/json
   "validDays": 365,
   "mt": "1-1",
   "st": "1-1-1",
-  "name": "测试课程104",
+  "name": "",
   "pic": "",
   "teachmode": "200002",
   "users": "初级人员",
@@ -37,3 +37,8 @@ Content-Type: application/json
   "grade": "204001",
   "description": ""
 }
+
+### 查询单条课程信息
+GET {{content_host}}/content/course/1000
+
+<> 2023-07-02T173705.200.json

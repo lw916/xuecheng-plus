@@ -11,6 +11,7 @@ import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
+import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseCategory;
@@ -77,34 +78,35 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
         // 参数合法性校验
         // @TODO 后期通过加参数的方式，实现参数合法性校验
-        if (StringUtils.isBlank(addCourseDto.getName())) {
-//            throw new RuntimeException("课程名称为空");
-            XueChengPlusException.cast("课程名称为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getMt())) {
-            XueChengPlusException.cast("课程分类为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getSt())) {
-            XueChengPlusException.cast("课程分类为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getGrade())) {
-            XueChengPlusException.cast("课程等级为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getTeachmode())) {
-            XueChengPlusException.cast("教育模式为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getUsers())) {
-            XueChengPlusException.cast("适应人群为空");
-        }
-
-        if (StringUtils.isBlank(addCourseDto.getCharge())) {
-            XueChengPlusException.cast("收费规则为空");
-        }
+        // 使用JSR303去验证参数合法性
+//        if (StringUtils.isBlank(addCourseDto.getName())) {
+////            throw new RuntimeException("课程名称为空");
+//            XueChengPlusException.cast("课程名称为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getMt())) {
+//            XueChengPlusException.cast("课程分类为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getSt())) {
+//            XueChengPlusException.cast("课程分类为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getGrade())) {
+//            XueChengPlusException.cast("课程等级为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getTeachmode())) {
+//            XueChengPlusException.cast("教育模式为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getUsers())) {
+//            XueChengPlusException.cast("适应人群为空");
+//        }
+//
+//        if (StringUtils.isBlank(addCourseDto.getCharge())) {
+//            XueChengPlusException.cast("收费规则为空");
+//        }
 
         // 向课程基本信息表写入数据 course_base
         CourseBase courseBase = new CourseBase();
@@ -134,6 +136,45 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //从数据库中查询课程信息
         CourseBaseInfoDto courseBaseInfoDto = getCourseBaseInfo(id);
         if(courseBaseInfoDto == null) XueChengPlusException.cast("查询课程信息失败");
+        return courseBaseInfoDto;
+    }
+
+    @Override
+    // 查询单条课程的接口实现
+    public CourseBaseInfoDto getCourseBaseById(Long courseId) {
+        CourseBaseInfoDto courseBaseInfoDto = getCourseBaseInfo(courseId);
+        if(courseBaseInfoDto == null){
+            XueChengPlusException.cast("未查询到该条课程信息");
+        }
+        return courseBaseInfoDto;
+    }
+
+    @Override
+    @Transactional // 事务
+    // 单条信息的修改
+    public CourseBaseInfoDto updateCourseBaseById(Long companyId, EditCourseDto editCourseDto) {
+        // 课程Id
+        Long courseId = editCourseDto.getId();
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase == null) XueChengPlusException.cast("课程不存在");
+        // 校验是否为本机构的课程
+        if(!courseBase.getCompanyId().equals(companyId)) XueChengPlusException.cast("仅能修改本机构的课程");
+        // 封装基本信息的数据
+        BeanUtils.copyProperties(editCourseDto, courseBase);
+        courseBase.setCreateDate(LocalDateTime.now());
+
+        // 更新课程基本信息
+        int updateStatus = courseBaseMapper.updateById(courseBase);
+        if( updateStatus <= 0 ) XueChengPlusException.cast("修改课程信息失败");
+
+        // 分装课程营销信息的数据
+        CourseMarket courseMarket = new CourseMarket();
+        BeanUtils.copyProperties(editCourseDto, courseMarket);
+        saveCourseMarketInfo(courseMarket);
+
+        // 修改完查询课程信息 包括课程基础信息和课程营销信息
+        CourseBaseInfoDto courseBaseInfoDto = this.getCourseBaseInfo(courseId);
+
         return courseBaseInfoDto;
     }
 

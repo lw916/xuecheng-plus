@@ -1,15 +1,14 @@
 package com.xuecheng.content.api;
 
 import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachPlanDto;
 import com.xuecheng.content.service.TeachplanService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,10 +30,15 @@ public class TeachPlanController {
     @ApiOperation("查询课程计划树形结构")
     @ApiImplicitParam(value="courseId", name = "课程Id", required = true, dataType = "Long", paramType = "path")
     public List<TeachPlanDto> getTree(@PathVariable Long courseId){
-
         List<TeachPlanDto> tree = teachplanService.findTeachplanTree(courseId);
         if(tree == null) XueChengPlusException.cast("未查询到该课程或该课程的小章节");
         return tree;
+    }
+
+    @PostMapping("/teachplan")
+    @ApiOperation("增加或修改章节接口")
+    public void saveOrUpdateTeachPlan(@RequestBody SaveTeachplanDto saveTeachplanDto){
+        teachplanService.saveOrUpdateTeachPlan(saveTeachplanDto);
     }
 
 }

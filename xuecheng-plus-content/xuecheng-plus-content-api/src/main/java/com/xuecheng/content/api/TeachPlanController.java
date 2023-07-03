@@ -48,4 +48,18 @@ public class TeachPlanController {
         teachplanService.deleteTeachPlan(planId);
     }
 
+    @PostMapping("/teachplan/moveup/{planId}")
+    @ApiOperation("章节上移接口")
+    @ApiImplicitParam(value="planId", name = "章节Id", required = true, dataType = "Long", paramType = "path")
+    public void moveUp(@PathVariable Long planId){
+        teachplanService.move(planId, false);
+    }
+
+    @PostMapping("/teachplan/movedown/{planId}")
+    @ApiOperation("章节上移接口")
+    @ApiImplicitParam(value="planId", name = "章节Id", required = true, dataType = "Long", paramType = "path")
+    public void moveDown(@PathVariable Long planId){
+        teachplanService.move(planId, true);
+    }
+
 }

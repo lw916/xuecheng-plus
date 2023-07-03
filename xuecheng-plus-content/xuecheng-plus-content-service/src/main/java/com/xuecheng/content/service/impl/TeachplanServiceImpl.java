@@ -91,6 +91,48 @@ public class TeachplanServiceImpl implements  TeachplanService {
     }
 
     /**
+     * @description 用于章节上移的服务
+     * @param id 章节id
+     */
+    @Override
+    @Transactional
+    public void move(Long id, Boolean direction) {
+        Teachplan original = teachplanMapper.selectById(id);
+        // 如果不能找到这个章节
+        if(original == null) XueChengPlusException.cast("未找到该章节");
+        int orderBy = original.getOrderby();
+        int newOrderBy = 0;
+        if(direction){
+            newOrderBy = orderBy + 1;
+        }else{
+            newOrderBy = orderBy - 1;
+        }
+        Long courseId = original.getCourseId();
+        Long parentId = original.getParentid();
+        // 寻找该章节的排序上章节
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getCourseId, courseId);
+        queryWrapper.eq(Teachplan::getParentid, parentId);
+        queryWrapper.eq(Teachplan::getOrderby, newOrderBy);
+        Teachplan replace = teachplanMapper.selectOne(queryWrapper);
+        if(replace == null) XueChengPlusException.cast("该章节不可移动");
+
+        // 章节对调
+        original.setOrderby(newOrderBy);
+        replace.setOrderby(orderBy);
+
+        // 修改数据库
+        int original_result = teachplanMapper.updateById(original);
+        int replace_result = teachplanMapper.updateById(replace);
+
+        if(original_result <= 0 || replace_result <= 0){
+            XueChengPlusException.cast("上移失败,请检查参数");
+        }
+
+    }
+
+
+    /**
      * @description 查询子节点下所有的节点个数
      * @param courseId 课程ID
      * @param parentId 父节点ID

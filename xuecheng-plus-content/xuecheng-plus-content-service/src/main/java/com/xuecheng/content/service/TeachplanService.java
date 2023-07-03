@@ -28,8 +28,17 @@ public interface TeachplanService {
 
 
     /**
-     * @description
+     * @description 删除章节
      * @param id 删除章节的章节id
      */
     public void deleteTeachPlan(Long id);
+
+    /**
+     * @description 章节上移动
+     * @param id 章节ID
+     * @param direction 向上true或向下false
+     */
+    public void move(Long id, Boolean direction);
+
+
 }

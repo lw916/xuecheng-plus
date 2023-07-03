@@ -6,16 +6,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.mapper.CourseBaseMapper;
-import com.xuecheng.content.mapper.CourseCategoryMapper;
-import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.*;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
-import com.xuecheng.content.model.po.CourseBase;
-import com.xuecheng.content.model.po.CourseCategory;
-import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +43,18 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
     @Autowired
     CourseCategoryMapper courseCategoryMapper;
+
+    @Autowired
+    CourseTeacherMapper courseTeacherMapper;
+
+    @Autowired
+    TeachplanWorkMapper teachplanWorkMapper;
+
+    @Autowired
+    TeachplanMapper teachplanMapper;
+
+    @Autowired
+    TeachplanMediaMapper teachplanMediaMapper;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto) {
@@ -178,6 +186,49 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         return courseBaseInfoDto;
     }
 
+    @Override
+    @Transactional
+    public void deleteCourse(Long courseId, Long companyId) {
+
+        // 查询是否有该课程&&机构是否拥有这门课程
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if(courseBase == null) XueChengPlusException.cast("不存在该门课程");
+        if(!courseBase.getCompanyId().equals(companyId)) XueChengPlusException.cast("无权限删除该课程");
+
+        // 删除课程需要先删除关联数据
+        // 删除师资信息
+        LambdaQueryWrapper<CourseTeacher> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(CourseTeacher::getCourseId, courseId);
+        int deleteTeacher = courseTeacherMapper.delete(queryWrapper1);
+
+        // 删除课程作业
+        LambdaQueryWrapper<TeachplanWork> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(TeachplanWork::getCourseId, courseId);
+        int deleteWork = teachplanWorkMapper.delete(queryWrapper2);
+
+        // 删除课程计划
+        LambdaQueryWrapper<Teachplan> queryWrapper3 = new LambdaQueryWrapper<>();
+        queryWrapper3.eq(Teachplan::getCourseId, courseId);
+        int deletePlan = teachplanMapper.delete(queryWrapper3);
+
+        // 删除课程媒体
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper4 = new LambdaQueryWrapper<>();
+        queryWrapper4.eq(TeachplanMedia::getCourseId, courseId);
+        int deleteMedia = teachplanMediaMapper.delete(queryWrapper4);
+
+        // 删除课程营销信息
+        LambdaQueryWrapper<CourseMarket> queryWrapper5 = new LambdaQueryWrapper<>();
+        queryWrapper5.eq(CourseMarket::getId, courseId);
+        int deleteMarket = courseMarketMapper.delete(queryWrapper5);
+
+        // 删除课程信息本体
+        int deleteCourse = courseBaseMapper.deleteById(courseId);
+
+        // 判断课程删除状态
+        if(deleteTeacher < 0 || deleteCourse < 0 || deleteMarket < 0 || deleteMedia < 0 || deletePlan < 0 || deleteWork < 0) XueChengPlusException.cast("删除课程失败");
+
+    }
+
     // 保存营销信息， 逻辑：存在即更新，不存在就创建
     private int saveCourseMarketInfo(CourseMarket courseMarket){
 
@@ -242,6 +293,8 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         courseBaseInfoDto.setStName(smallCategoryName.getName());
         return courseBaseInfoDto;
     }
+
+
 
 
 

@@ -30,6 +30,7 @@ public class ContentCodeGenerator {
 			"course_category",
 			"teachplan",
 			"teachplan_media",
+			"teachplan_work",
 			"course_publish",
 			"course_publish_pre"
 

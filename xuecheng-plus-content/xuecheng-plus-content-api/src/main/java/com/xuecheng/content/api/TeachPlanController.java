@@ -26,6 +26,7 @@ public class TeachPlanController {
     @Autowired
     TeachplanService teachplanService;
 
+    // @TODO 加课程机构验证
     @GetMapping("/teachplan/{courseId}/tree-nodes")
     @ApiOperation("查询课程计划树形结构")
     @ApiImplicitParam(value="courseId", name = "课程Id", required = true, dataType = "Long", paramType = "path")

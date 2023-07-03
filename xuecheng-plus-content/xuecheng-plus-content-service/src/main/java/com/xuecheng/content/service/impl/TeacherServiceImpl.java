@@ -60,6 +60,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @return
      */
     @Override
+    @Transactional
     public CourseTeacher editCourseTeacherInfo(CourseTeacher teacher) {
         // 查询教师是否存在
         if(getTeacherInfo(teacher) == null) XueChengPlusException.cast("该教师资料不存在");
@@ -78,6 +79,7 @@ public class TeacherServiceImpl implements TeacherService {
      * @param id 教师Id
      */
     @Override
+    @Transactional
     public void deleteCourseTeacherInfo(Long courseId, Long id) {
         // 查询教师是否存在
         LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();

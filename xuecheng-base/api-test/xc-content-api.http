@@ -48,3 +48,17 @@ GET {{content_host}}/content/teachplan/117/tree-nodes
 Content-Type: application/json
 
 <> 2023-07-02T224256.200.json
+
+### 教师信息修改
+PUT {{content_host}}/content/courseTeacher
+Content-Type: application/json
+
+{
+  "id": 27,
+  "courseId": 1,
+  "teacherName": "2345",
+  "position": "2335",
+  "introduction": "教师简介",
+  "photograph": null,
+  "createDate": null
+}

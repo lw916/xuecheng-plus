@@ -1,0 +1,64 @@
+### 查询课程信息
+POST {{content_host}}/content/course/list?pageNo=1&pageSize=2
+Content-Type: application/json
+
+{
+  "auditStatus": "202004",
+  "courseName": "java",
+  "publishStatus": ""
+}
+
+<> 2023-06-24T231221.200.json
+
+### 查询课程分类
+GET {{content_host}}/content/course-category/tree-nodes
+
+<> 2023-07-01T130810.200.json
+
+### 创建课程
+POST {{content_host}}/content/course
+Content-Type: application/json
+
+{
+  "charge": "201000",
+  "price": 0,
+  "originalPrice":0,
+  "qq": "22333",
+  "wechat": "223344",
+  "phone": "13333333",
+  "validDays": 365,
+  "mt": "1-1",
+  "st": "1-1-1",
+  "name": "",
+  "pic": "",
+  "teachmode": "200002",
+  "users": "初级人员",
+  "tags": "",
+  "grade": "204001",
+  "description": ""
+}
+
+### 查询单条课程信息
+GET {{content_host}}/content/course/1000
+
+<> 2023-07-02T173705.200.json
+
+### 课程计划查询
+GET {{content_host}}/content/teachplan/117/tree-nodes
+Content-Type: application/json
+
+<> 2023-07-02T224256.200.json
+
+### 教师信息修改
+PUT {{content_host}}/content/courseTeacher
+Content-Type: application/json
+
+{
+  "id": 27,
+  "courseId": 1,
+  "teacherName": "2345",
+  "position": "2335",
+  "introduction": "教师简介",
+  "photograph": null,
+  "createDate": null
+}

@@ -1,10 +1,13 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
+import com.xuecheng.content.mapper.TeachplanMediaMapper;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachPlanDto;
 import com.xuecheng.content.model.po.Teachplan;
+import com.xuecheng.content.model.po.TeachplanMedia;
 import com.xuecheng.content.service.TeachplanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -16,10 +19,13 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class TeachplanServiceImpl implements TeachplanService {
+public class TeachplanServiceImpl implements  TeachplanService {
 
     @Autowired
     TeachplanMapper teachplanMapper;
+
+    @Autowired
+    TeachplanMediaMapper teachplanMediaMapper;
 
     @Override
     public List<TeachPlanDto> findTeachplanTree(Long courseId) {
@@ -48,6 +54,40 @@ public class TeachplanServiceImpl implements TeachplanService {
             teachplanMapper.updateById(teachPlan);
         }
 
+    }
+
+    /**
+     * @description 删除章节的接口
+     * @param id 删除章节的章节id
+     */
+    @Override
+    @Transactional
+    public void deleteTeachPlan(Long id) {
+        Teachplan teachplan = teachplanMapper.selectById(id);
+        if(teachplan == null) XueChengPlusException.cast("未查询到该章节，请确认章节是否存在");
+        // 判断该章节是否为大章节
+        if(teachplan.getParentid() == 0){
+            // 判断该大章节下是否有小章节
+            // Select count(1) from teachPlan where course_id = xx and parent_id = 该章节的id
+            LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Teachplan::getCourseId, teachplan.getCourseId());
+            queryWrapper.eq(Teachplan::getParentid, id);
+            int count = teachplanMapper.selectCount(queryWrapper);
+            if(count == 0){
+                int result = teachplanMapper.deleteById(id);
+                if(result <= 0) XueChengPlusException.cast("删除本章失败");
+            }else XueChengPlusException.cast("课程计划信息还有子级信息，无法操作", "120409");
+        }else{
+            LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(TeachplanMedia::getTeachplanId, id);
+            TeachplanMedia teachplanMedia = teachplanMediaMapper.selectOne(queryWrapper);
+            if(teachplanMedia != null){
+                int deleteMediaInfo = teachplanMediaMapper.deleteById(teachplanMedia.getId());
+                if(deleteMediaInfo <= 0) XueChengPlusException.cast("删除本章失败");
+            }
+            int result = teachplanMapper.deleteById(id);
+            if(result <= 0) XueChengPlusException.cast("删除本章失败");
+        }
     }
 
     /**

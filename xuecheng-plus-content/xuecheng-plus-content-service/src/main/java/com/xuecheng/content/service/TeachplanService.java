@@ -25,4 +25,11 @@ public interface TeachplanService {
      * @param saveTeachplanDto 传过来的一些参数
      */
     public void saveOrUpdateTeachPlan(SaveTeachplanDto saveTeachplanDto);
+
+
+    /**
+     * @description
+     * @param id 删除章节的章节id
+     */
+    public void deleteTeachPlan(Long id);
 }

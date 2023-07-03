@@ -41,4 +41,11 @@ public class TeachPlanController {
         teachplanService.saveOrUpdateTeachPlan(saveTeachplanDto);
     }
 
+    @DeleteMapping("/teachplan/{planId}")
+    @ApiOperation("删除章节接口")
+    @ApiImplicitParam(value="planId", name = "章节Id", required = true, dataType = "Long", paramType = "path")
+    public void deleteTeachPlan(@PathVariable Long planId){
+        teachplanService.deleteTeachPlan(planId);
+    }
+
 }

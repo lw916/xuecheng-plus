@@ -36,9 +36,15 @@ public class GlobalExceptionHandler {
 
         // 解析异常信息
         String errMessage = exception.getErrMessage();
-        return new RestErrorResponse(errMessage);
+        String errCode = exception.getErrCode();
+        if(errCode == null){
+            return new RestErrorResponse(errMessage);
+        }else{
+            return new RestErrorResponse(errMessage, errCode);
+        }
 
     }
+
 
     // 系统异常方法
     @ResponseBody

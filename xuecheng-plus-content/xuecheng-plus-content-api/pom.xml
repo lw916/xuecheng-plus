@@ -67,6 +67,18 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- 配置服务注册到Nacos中 想注册用这个 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- 增加读取配置文件的依赖 想配置中心用这个-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+
     </dependencies>
 
 </project>

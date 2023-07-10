@@ -97,7 +97,7 @@
             two.course_pub_id two_coursePubId,
             three.id teachplaMediaId,
             three.media_id mediaId,
-            three.media_fileName
+            three.media_fileName mediaFilename
         FROM
             teachplan one
                 LEFT JOIN teachplan two ON two.parentid = one.id

@@ -101,7 +101,7 @@
         FROM
             teachplan one
                 LEFT JOIN teachplan two ON two.parentid = one.id
-                LEFT JOIN teachplan_media three ON two.course_id = three.course_id
+                LEFT JOIN teachplan_media three ON two.course_id = three.course_id and two.id = three.teachplan_id
         WHERE
             one.parentid = 0 AND one.course_id = #{value}
             order BY one.orderby, two.orderby

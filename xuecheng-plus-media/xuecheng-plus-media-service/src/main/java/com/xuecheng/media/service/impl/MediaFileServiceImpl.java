@@ -9,10 +9,12 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
 import io.minio.*;
 import io.minio.errors.*;
@@ -28,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.activation.MimeType;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -56,6 +59,9 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Autowired
     MediaFileService currentProxy;
+
+    @Autowired
+    MediaProcessMapper mediaProcessMapper;
 
     //存储普通文件
     @Value("${minio.bucket.files}")
@@ -213,8 +219,12 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.debug("向数据库保存文件失败,bucket:{},objectName:{}", bucket, objectName);
                 return null;
             }
+            // 记录文件的待处理任务 在这个方法里因为有事务
+            // tongguomineType判断视频格式，如avi
+            //@Todo 后期加后缀判断
+            // 向mediaProcess插入记录
+            addWaitingTask(mediaFiles);
             return mediaFiles;
-
         }
         return mediaFiles;
 
@@ -449,6 +459,25 @@ public class MediaFileServiceImpl implements MediaFileService {
     // 根据md5和后缀名获取文件路径和文件名
     private String getFilePathByMd5(String fileMd5, String fileExt){
         return fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/" + fileMd5 + fileExt;
+    }
+
+    // 添加待处理任务
+    private void addWaitingTask(MediaFiles mediaFiles){
+        // 获取mimeType
+        String fileName = mediaFiles.getFilename();
+        // 获取文件扩展名
+        String extension = fileName.substring(fileName.lastIndexOf("."));
+        String mimeType = getMimeType(extension);
+        if(mimeType.equals("video/x-msvideo")){
+            // 如果是avi文件则写入数据库
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles, mediaProcess);
+            // 设置状态
+            mediaProcess.setStatus("1");
+            mediaProcess.setCreateDate(LocalDateTime.now());
+            mediaProcess.setFailCount(0);
+            mediaProcessMapper.insert(mediaProcess);
+        }
     }
 
 

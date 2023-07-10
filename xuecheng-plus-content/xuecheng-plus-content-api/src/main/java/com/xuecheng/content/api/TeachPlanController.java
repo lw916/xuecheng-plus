@@ -4,6 +4,7 @@ import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachPlanDto;
 import com.xuecheng.content.service.TeachplanService;
+import com.xuecheng.media.model.dto.BindTeachplanMediaDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -62,5 +63,20 @@ public class TeachPlanController {
     public void moveDown(@PathVariable Long planId){
         teachplanService.move(planId, true);
     }
+
+    @ApiOperation(value = "课程计划和媒资信息绑定")
+    @PostMapping("/teachplan/association/media")
+    // 章节添加视频，需要先删除原有章节附带的视频再添加新的视频
+    public void associationMedia(@RequestBody BindTeachplanMediaDto bindTeachplanMediaDto){
+        teachplanService.associationMedia(bindTeachplanMediaDto);
+    }
+
+    @ApiOperation(value = "删除课程计划和媒资信息绑定")
+    @DeleteMapping("/teachplan/association/media/{teachPlanId}/{mediaId}")
+    // 章节添加视频，需要先删除原有章节附带的视频再添加新的视频
+    public void deleteAssociationMedia(@PathVariable Long teachPlanId, @PathVariable String mediaId){
+        teachplanService.deleteAssociationMedia(teachPlanId, mediaId);
+    }
+
 
 }

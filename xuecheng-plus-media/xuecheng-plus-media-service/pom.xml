@@ -68,6 +68,13 @@
             <version>4.8.1</version>
         </dependency>
 
+        <!-- XXL-job包注册 -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+
+
     </dependencies>
 
 </project>

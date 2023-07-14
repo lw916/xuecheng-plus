@@ -40,9 +40,10 @@ public class MediaFilesController {
 
     }
 
-    @ApiOperation("上传图片")
+    @ApiOperation("上传文件")
     @RequestMapping(value = "/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UploadFileResultDto upload(@RequestPart("filedata") MultipartFile filedata) throws IOException {
+    public UploadFileResultDto upload(@RequestPart("filedata") MultipartFile filedata,
+                                      @RequestParam(value= "objectName",required=false) String objectName) throws IOException {
 
         // 已经接收到文件的了（前端已经发过来了）
         //准备上传文件的信息
@@ -61,9 +62,7 @@ public class MediaFilesController {
         String localFilePath = tempFile.getAbsolutePath();
 
         //调用service上传图片
-        UploadFileResultDto uploadFileResultDto = mediaFileService.uploadFile(companyId, uploadFileParamsDto, localFilePath);
-
-        return uploadFileResultDto;
+        return mediaFileService.uploadFile(companyId, uploadFileParamsDto, localFilePath, objectName);
     }
 
 }

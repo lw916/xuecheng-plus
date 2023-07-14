@@ -5,10 +5,9 @@ spring:
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
-      # 不注册服务，即不使用该服务进行对外接口服务
-      #      discovery: # 服务注册相关配置
-      #        namespace: dev
-      #        group: xuecheng-plus-project
+      discovery: # 服务注册相关配置
+        namespace: dev
+        group: xuecheng-plus-project
       config: # 配置文件相关配置
         namespace: dev
         group: xuecheng-plus-project

@@ -1,6 +1,11 @@
 package com.xuecheng.content.jobhandler;
 
 import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.feignclient.SearchServiceClient;
+import com.xuecheng.content.mapper.CoursePublishMapper;
+import com.xuecheng.content.model.dto.CourseIndex;
+import com.xuecheng.content.model.dto.CoursePreviewDto;
+import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MessageProcessAbstract;
@@ -8,6 +13,8 @@ import com.xuecheng.messagesdk.service.MqMessageService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,6 +26,12 @@ public class CoursePublishTask extends MessageProcessAbstract {
 
     @Resource
     CoursePublishService coursePublishService;
+
+    @Resource
+    SearchServiceClient searchServiceClient;
+
+    @Autowired
+    CoursePublishMapper coursePublishMapper;
 
     // 任务调度入口
     @XxlJob("CoursePublishJobHandler")
@@ -38,7 +51,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         Long courseId = Long.parseLong(mqMessage.getBusinessKey1());
 
         // 向elasticsearch写索引
-//        saveCourseIndex(mqMessage, courseId);
+        saveCourseIndex(mqMessage, courseId);
 
         // 向redis写缓存
 //        saveCourseCache(mqMessage, courseId);
@@ -47,7 +60,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
         generateCourseHtml(mqMessage, courseId);
 
         // 返回结果
-        return true;
+        return false;
     }
 
     // 缓存信息到Redis
@@ -84,7 +97,17 @@ public class CoursePublishTask extends MessageProcessAbstract {
             return;
         }
 
-        // 开始进行课程序列化
+        // 查询课程信息，添加搜索索引
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        // 造CourseIndex数据
+        CourseIndex courseIndex = new CourseIndex();
+        BeanUtils.copyProperties(coursePublish, courseIndex);
+        // 远程调用
+        boolean add = searchServiceClient.add(courseIndex);
+        if(!add){
+            XueChengPlusException.cast("远程调用添加索引失败");
+            return; // 不能直接抛出索引，需要直接return不记录数据，达到分布式事务的结果
+        }
 
         // 任务完成写状态为完成
         mqMessageService.completedStageTwo(taskId);

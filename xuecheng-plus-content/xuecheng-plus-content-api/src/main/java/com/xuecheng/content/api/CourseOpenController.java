@@ -16,10 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CourseOpenController {
 
     @Autowired
-    private CourseBaseInfoService courseBaseInfoService;
-
-
-    @Autowired
     private CoursePublishService coursePublishService;
 
     // 根据课程id获取课程信息

@@ -62,3 +62,6 @@ Content-Type: application/json
   "photograph": null,
   "createDate": null
 }
+
+### 获取课程信息
+GET {{content_host}}/open/course/whole/145

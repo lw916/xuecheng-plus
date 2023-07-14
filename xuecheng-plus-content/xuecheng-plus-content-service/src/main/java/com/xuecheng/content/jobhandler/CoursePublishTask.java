@@ -1,5 +1,7 @@
-package com.xuecheng.messagesdk.service.jobhandler;
+package com.xuecheng.content.jobhandler;
 
+import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MessageProcessAbstract;
 import com.xuecheng.messagesdk.service.MqMessageService;
@@ -8,9 +10,15 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import java.io.File;
+
 @Slf4j
 @Component
 public class CoursePublishTask extends MessageProcessAbstract {
+
+    @Resource
+    CoursePublishService coursePublishService;
 
     // 任务调度入口
     @XxlJob("CoursePublishJobHandler")
@@ -30,17 +38,16 @@ public class CoursePublishTask extends MessageProcessAbstract {
         Long courseId = Long.parseLong(mqMessage.getBusinessKey1());
 
         // 向elasticsearch写索引
-        saveCourseIndex(mqMessage, courseId);
+//        saveCourseIndex(mqMessage, courseId);
 
         // 向redis写缓存
-        saveCourseCache(mqMessage, courseId);
+//        saveCourseCache(mqMessage, courseId);
 
         // 课程静态化上传到minIO
         generateCourseHtml(mqMessage, courseId);
 
-
         // 返回结果
-        return false;
+        return true;
     }
 
     // 缓存信息到Redis
@@ -99,6 +106,14 @@ public class CoursePublishTask extends MessageProcessAbstract {
         }
 
         // 开始进行课程静态化
+        // 包括生成Html静态文件
+        File file = coursePublishService.generateCourseHtml(courseId);
+        // 上传文件到Minio
+        if(file != null){
+            coursePublishService.uploadCourseHtml(courseId, file);
+        }else{
+            XueChengPlusException.cast("生成静态文件失败");
+        }
 
         // 任务完成写状态为完成
         mqMessageService.completedStageThree(taskId);

@@ -29,7 +29,7 @@ public abstract class MessageProcessAbstract {
      * @author Mr.M
      * @date 2022/9/21 19:47
      */
-    // 引用抽象类，重写他完成吧
+    // 引用抽象类，重写他完成
     public abstract boolean execute(MqMessage mqMessage);
 
 

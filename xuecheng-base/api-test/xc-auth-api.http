@@ -6,3 +6,8 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 
 ### 密码模式
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username=zhangsan&password=123
+
+###校验jwt令牌
+POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE2ODk0MTA3ODAsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6IjY0MzM0YzdhLWU2YjEtNDRkNS1iZjgxLWVlMWVmMDhiZTlkZiIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.-A2JXfOTC_RE7tjZQR4TotEKdik49Yki4iLuxKyLcq8
+
+<> 2023-07-15T123822.200.json

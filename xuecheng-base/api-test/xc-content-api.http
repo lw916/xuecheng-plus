@@ -40,12 +40,15 @@ Content-Type: application/json
 
 ### 查询单条课程信息
 GET {{content_host}}/content/course/1000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE2ODk0MDMxMDIsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6IjNlNGU1ODgxLTg3MmYtNDRmMC1hMDYzLTk4NGExNmFkYTgxYyIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.G3xR7FgcfhsX4LsGKyMwJMcQ_F31ekZ1rpze2qpEBe0
 
 <> 2023-07-02T173705.200.json
 
 ### 课程计划查询
 GET {{content_host}}/content/teachplan/117/tree-nodes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE2ODk0MDMxMDIsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6IjNlNGU1ODgxLTg3MmYtNDRmMC1hMDYzLTk4NGExNmFkYTgxYyIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.G3xR7FgcfhsX4LsGKyMwJMcQ_F31ekZ1rpze2qpEBe0
+
 
 <> 2023-07-02T224256.200.json
 
@@ -65,3 +68,8 @@ Content-Type: application/json
 
 ### 获取课程信息
 GET {{content_host}}/open/course/whole/145
+
+
+### 查询单条课程信息
+GET {{gateway_host}}/content/course/40
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE2ODk0MTA0MjQsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6ImVlM2IwZWExLWRlMzAtNDk4Zi04ZDViLWNjYzk0ZGU0YmIyMyIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.gF9jcsxbWL5hssgBUE8whlsdviO-aLSIJg4_Spy3aPc

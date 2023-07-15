@@ -8,6 +8,9 @@ POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&gr
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username=zhangsan&password=123
 
 ###校验jwt令牌
-POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE2ODk0MTA3ODAsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6IjY0MzM0YzdhLWU2YjEtNDRkNS1iZjgxLWVlMWVmMDhiZTlkZiIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.-A2JXfOTC_RE7tjZQR4TotEKdik49Yki4iLuxKyLcq8
+POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJzdHUxIiwic2NvcGUiOlsiYWxsIl0sImV4cCI6MTY4OTQxMjQxMSwiYXV0aG9yaXRpZXMiOlsidGVzdCJdLCJqdGkiOiI3M2UwMTIxMS00ODE3LTRjOTItYjAzMS05NjE3YjkwNTc1ODgiLCJjbGllbnRfaWQiOiJYY1dlYkFwcCJ9.BNDss2U2w3w6FUuyswHy_xo5Jv_lOf9gOahs1VFySI0
 
 <> 2023-07-15T123822.200.json
+
+### 密码模式 启用了数据库查询
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username=stu1&password=111111

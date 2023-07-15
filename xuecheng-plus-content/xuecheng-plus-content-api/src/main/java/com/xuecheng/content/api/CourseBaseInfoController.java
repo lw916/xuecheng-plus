@@ -44,7 +44,7 @@ public class CourseBaseInfoController {
         // @TODO 单点登录后获取用户机构ID
 //        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //  获取用户信息，前提是携带令牌访问
         SecurityUtil.XcUser xcUser = SecurityUtil.getUser();
-        Long companyId = 1232141425L;
+        Long companyId = Long.valueOf(xcUser.getCompanyId());
 
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);
     }

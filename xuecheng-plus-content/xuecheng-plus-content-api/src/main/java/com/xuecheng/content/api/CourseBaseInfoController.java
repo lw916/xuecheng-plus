@@ -9,6 +9,7 @@ import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.utils.SecurityUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class CourseBaseInfoController {
     public CourseBaseInfoDto createCourseBase(@RequestBody @Validated(ValidationGroups.Insert.class) AddCourseDto addCourseDto){
 
         // @TODO 单点登录后获取用户机构ID
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //  获取用户信息，前提是携带令牌访问
-
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal(); //  获取用户信息，前提是携带令牌访问
+        SecurityUtil.XcUser xcUser = SecurityUtil.getUser();
         Long companyId = 1232141425L;
 
         return courseBaseInfoService.createCourseBase(companyId, addCourseDto);

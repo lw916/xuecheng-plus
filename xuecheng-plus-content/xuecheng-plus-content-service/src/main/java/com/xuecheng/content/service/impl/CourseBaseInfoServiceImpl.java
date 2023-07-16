@@ -47,7 +47,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
 
 
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto courseParamsDto) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto courseParamsDto) {
 
         //拼装查询条件
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
@@ -56,7 +56,8 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //根据课程审核状态查询 course_base.audit_status = ?
         queryWrapper.eq(StringUtils.isNotEmpty(courseParamsDto.getAuditStatus()), CourseBase::getAuditStatus,courseParamsDto.getAuditStatus());
         //todo:按课程发布状态查询
-
+        //按照机构ID去查询
+        queryWrapper.eq(CourseBase::getCompanyId, companyId);
         //创建page分页参数对象，参数：当前页码，每页记录数
         Page<CourseBase> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         //开始进行分页查询
@@ -199,7 +200,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
             XueChengPlusException.cast("修改课程失败");
         }
         //更新营销信息
-        //todo:更新营销信息
+        CourseMarket courseMarket = new CourseMarket();
+        BeanUtils.copyProperties(editCourseDto, courseMarket);
+        saveCourseMarket(courseMarket);
         //查询课程信息
         CourseBaseInfoDto courseBaseInfo = getCourseBaseInfo(courseId);
 

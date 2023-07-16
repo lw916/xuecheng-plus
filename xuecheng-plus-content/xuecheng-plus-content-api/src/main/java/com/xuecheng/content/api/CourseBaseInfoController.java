@@ -39,7 +39,14 @@ public class CourseBaseInfoController {
     @PreAuthorize("hasAnyAuthority('xc_teachmanager_course_list')") // 判断该用户是否有该权限
     public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required=false) QueryCourseParamsDto queryCourseParamsDto) {
 
-        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
+        // 获取当前登录的用户
+        SecurityUtil.XcUser xcUser = SecurityUtil.getUser();
+        Long companyId = 0L;
+        // 获取用户机构ID
+        if(!xcUser.getCompanyId().isEmpty()){
+            companyId = Long.valueOf(xcUser.getCompanyId());
+        }
+        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(companyId, pageParams, queryCourseParamsDto);
 
         return courseBasePageResult;
 

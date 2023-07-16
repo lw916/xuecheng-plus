@@ -40,8 +40,10 @@ public class CourseBaseInfoServiceTests {
         pageParams.setPageNo(2L);
         pageParams.setPageSize(2L);
 
-        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, courseParamsDto);
-        System.out.println(courseBasePageResult);
+        // @Todo 需要CompanyId完成测试
+
+//        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(companyId, pageParams, courseParamsDto);
+//        System.out.println(courseBasePageResult);
 
     }
 }

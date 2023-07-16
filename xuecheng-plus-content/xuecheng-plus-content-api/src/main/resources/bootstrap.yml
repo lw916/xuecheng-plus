@@ -1,22 +1,22 @@
+#server:
+#  servlet:
+#    context-path: /content
+#  port: 63041
 #微服务配置
-# 使用Nacos进行配置中心配置管理
-
-# Data Id命名规则：服务吗-环境-yaml content-api-dev.yaml 在nacos中添加
 spring:
   application:
-    name: content-api # 服务名
+    name: content-api #服务名content-api-dev.yaml
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
-      discovery: # 服务注册相关配置
+      discovery: #服务注册相关配置
         namespace: dev
         group: xuecheng-plus-project
-      config: # 配置文件相关配置
+      config: #配置文件相关配置
         namespace: dev
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
-        # 引用别的微服务的配置使用extension
         extension-configs:
           - data-id: content-service-${spring.profiles.active}.yaml
             group: xuecheng-plus-project
@@ -33,13 +33,21 @@ spring:
             refresh: true
           - data-id: feign-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
-            refresh: true
-  profiles:
-    active: dev # 环境名
+            refresh: true  #profiles默认为dev
 
-# 日志文件配置路径
+
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.101.65:3306/xc402_content?serverTimezone=UTC&userUnicode=true&useSSL=false&
+#    username: root
+#    password: mysql
+
+  profiles:
+    active: dev   #环境名
+
 #logging:
-#  config: classpath:log4j2-dev.xml
+#  config: classpath:log4j2-dev.xml  # 日志文件配置路径
+
 
 #swagger:
 #  title: "学成在线内容管理系统"

@@ -5,19 +5,16 @@ import com.xuecheng.content.model.dto.CourseCategoryTreeDto;
 import java.util.List;
 
 /**
- *
- * @author Wayne
- * @description 调用mapper查询课程分类接口
- * @date 2023/7/1
+ * @author Mr.M
+ * @version 1.0
+ * @description TODO
+ * @date 2023/2/12 14:49
  */
 public interface CourseCategoryService {
-
-    /**
-     *
-     * @param id
-     * @return 返回的课程分类列表
-     */
-    // 课程列表树结构查询
-    public List<CourseCategoryTreeDto> queryTreeNodes(String id);
-
+ /**
+  * 课程分类树形结构查询
+  *
+  * @return
+  */
+ public List<CourseCategoryTreeDto> queryTreeNodes(String id);
 }

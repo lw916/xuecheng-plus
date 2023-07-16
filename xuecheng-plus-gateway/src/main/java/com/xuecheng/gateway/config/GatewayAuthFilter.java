@@ -35,43 +35,6 @@ import java.util.Set;
 @Slf4j
 public class GatewayAuthFilter implements GlobalFilter, Ordered {
 
-    @Autowired
-    private TokenStore tokenStore;
-
-
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String requestUrl = exchange.getRequest().getPath().value();
-        AntPathMatcher pathMatcher = new AntPathMatcher();
-        //白名单放行
-        for (String url : whitelist) {
-            if (pathMatcher.match(url, requestUrl)) {
-                return chain.filter(exchange); // 白名单内放行
-            }
-        }
-
-        //检查token是否存在
-        // 不在白名单被开始校验
-        String token = getToken(exchange);
-        if (StringUtils.isBlank(token)) {
-            return buildReturnMono("没有认证",exchange);
-        }
-        //判断是否是有效的token
-        OAuth2AccessToken oAuth2AccessToken;
-        try {
-            oAuth2AccessToken = tokenStore.readAccessToken(token);
-
-            boolean expired = oAuth2AccessToken.isExpired();
-            if (expired) {
-                return buildReturnMono("认证令牌已过期",exchange);
-            }
-            return chain.filter(exchange);
-        } catch (InvalidTokenException e) {
-            log.info("认证令牌无效: {}", token);
-            return buildReturnMono("认证令牌无效",exchange);
-        }
-
-    }
 
     //白名单
     private static List<String> whitelist = null;
@@ -89,6 +52,45 @@ public class GatewayAuthFilter implements GlobalFilter, Ordered {
         } catch (Exception e) {
             log.error("加载/security-whitelist.properties出错:{}",e.getMessage());
             e.printStackTrace();
+        }
+
+
+    }
+
+    @Autowired
+    private TokenStore tokenStore;
+
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        //请求的url
+        String requestUrl = exchange.getRequest().getPath().value();
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        //白名单放行
+        for (String url : whitelist) {
+            if (pathMatcher.match(url, requestUrl)) {
+                return chain.filter(exchange);
+            }
+        }
+
+        //检查token是否存在
+        String token = getToken(exchange);
+        if (StringUtils.isBlank(token)) {
+            return buildReturnMono("没有认证",exchange);
+        }
+        //判断是否是有效的token
+        OAuth2AccessToken oAuth2AccessToken;
+        try {
+            oAuth2AccessToken = tokenStore.readAccessToken(token);
+
+            boolean expired = oAuth2AccessToken.isExpired();
+            if (expired) {
+                return buildReturnMono("认证令牌已过期",exchange);
+            }
+            return chain.filter(exchange);
+        } catch (InvalidTokenException e) {
+            log.info("认证令牌无效: {}", token);
+            return buildReturnMono("认证令牌无效",exchange);
         }
 
     }

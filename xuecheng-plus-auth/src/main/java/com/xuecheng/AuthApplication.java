@@ -15,8 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootApplication
+
 @EnableFeignClients(basePackages = "com.xuecheng.ucenter.feignclient")
+@SpringBootApplication
 public class AuthApplication {
 
     public static void main(String[] args) {
@@ -24,12 +25,9 @@ public class AuthApplication {
     }
 
     @Bean
-    // 远程调用 使用restTemplate
-    // @Todo 看看啥是RestTemplate
     RestTemplate restTemplate(){
         RestTemplate restTemplate = new RestTemplate(new OkHttp3ClientHttpRequestFactory());
-        return restTemplate;
+        return  restTemplate;
     }
-
 
 }

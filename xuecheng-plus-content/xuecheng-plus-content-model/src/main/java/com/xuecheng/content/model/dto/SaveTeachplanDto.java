@@ -1,18 +1,15 @@
 package com.xuecheng.content.model.dto;
 
 import lombok.Data;
-import lombok.ToString;
 
 /**
- *
- * @author Wayne
- * @description 大小章节的添加接口
- * @date 2023/7/2
+ * @author Mr.M
+ * @version 1.0
+ * @description 新增大章节、小章节、修改章节信息
+ * @date 2023/2/14 14:54
  */
-
 @Data
-@ToString
-public class SaveTeachplanDto{
+public class SaveTeachplanDto {
 
     /***
      * 教学计划id
@@ -55,8 +52,4 @@ public class SaveTeachplanDto{
      * 是否支持试学或预览（试看）
      */
     private String isPreview;
-
-
-
-
 }

@@ -1,7 +1,7 @@
 package com.xuecheng.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.xuecheng.content.model.dto.TeachPlanDto;
+import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface TeachplanMapper extends BaseMapper<Teachplan> {
 
-    // 课程计划查询
-    public List<TeachPlanDto> selectTreeNodes(Long courseId);
+    //课程计划查询
+    public List<TeachplanDto> selectTreeNodes(Long courseId);
 
 }

@@ -7,12 +7,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
+ * <p>
+ * 课程基本信息
+ * </p>
  *
- * @author Wayne
- * @description 课程基本信息
- * @date 2023/6/24
+ * @author itcast
  */
-
 @Data
 @TableName("course_base")
 public class CourseBase implements Serializable {

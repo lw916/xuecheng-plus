@@ -3,26 +3,30 @@ package com.xuecheng.content.feignclient;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Component
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description TODO
+ * @date 2023/2/22 11:09
+ */
 @Slf4j
+@Component
 public class MediaServiceClientFallbackFactory implements FallbackFactory<MediaServiceClient> {
+ //拿到了熔断的异常信息throwable
+ @Override
+ public MediaServiceClient create(Throwable throwable) {
 
-    // 拿到熔断时的异常信息
-    @Override
-    public MediaServiceClient create(Throwable throwable) {
-
-        // 当发生了熔断，上传服务器调用此方法降级逻辑
-        return new MediaServiceClient() {
-            @Override
-            public String upload(MultipartFile filedata, String objectName) throws IOException {
-                log.debug("远程调用出现错误，发生熔断的原因：{}", throwable.toString(), throwable);
-                return null;
-            }
-        };
-    }
+  return new MediaServiceClient() {
+   //发生熔断上传服务调用此方法执行降级逻辑
+   @Override
+   public String upload(MultipartFile filedata, String objectName) throws IOException {
+     log.debug("远程调用上传文件的接口发生熔断:{}",throwable.toString(),throwable);
+    return null;
+   }
+  };
+ }
 }

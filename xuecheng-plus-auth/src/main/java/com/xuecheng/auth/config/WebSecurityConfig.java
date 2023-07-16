@@ -1,6 +1,5 @@
 package com.xuecheng.auth.config;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,16 +26,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    // 重写方法让验证方式不止用户密码认证
-    @Autowired
-    DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(daoAuthenticationProviderCustom);
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
-
-
 
     //配置用户信息服务
 //    @Bean
@@ -55,11 +48,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+    @Autowired
+    DaoAuthenticationProviderCustom daoAuthenticationProviderCustom;
 
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProviderCustom);
+    }
 
     //配置安全拦截机制
     @Override
@@ -72,18 +68,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().successForwardUrl("/login-success");//登录成功跳转到/login-success
     }
 
-
     public static void main(String[] args) {
         String password = "111111";
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        for(int i=0;i<10;i++) {
-            //每个计算出的Hash值都不一样
-            String hashPass = passwordEncoder.encode(password);
-            System.out.println(hashPass);
-            //虽然每次计算的密码Hash值不一样但是校验是通过的
-            boolean f = passwordEncoder.matches(password, hashPass);
-            System.out.println(f);
+        for (int i = 0; i < 5; i++) {
+            //生成密码
+            String encode = passwordEncoder.encode(password);
+            System.out.println(encode);
+            //校验密码,参数1是输入的明文 ，参数2是正确密码加密后的串
+            boolean matches = passwordEncoder.matches(password, encode);
+            System.out.println(matches);
         }
+
+        boolean matches = passwordEncoder.matches("1234", "$2a$10$fb2RlvFwr9HsRu9vH1OxCu/YiMRw6wy5UI6u3s0A.0bVSuR1UqdHK");
+        System.out.println(matches);
     }
 
 

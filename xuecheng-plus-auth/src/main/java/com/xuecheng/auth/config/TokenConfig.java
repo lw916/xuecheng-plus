@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * @author Administrator
@@ -21,7 +20,7 @@ import java.util.Collections;
 @Configuration
 public class TokenConfig {
 
-    private String SIGNING_KEY = "mq123"; // 对称加密
+    private String SIGNING_KEY = "mq123";
 
     @Autowired
     TokenStore tokenStore;
@@ -55,11 +54,13 @@ public class TokenConfig {
         service.setTokenStore(tokenStore);//令牌存储策略
 
         TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(accessTokenConverter));
+        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(accessTokenConverter));
         service.setTokenEnhancer(tokenEnhancerChain);
 
         service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
         service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
         return service;
     }
+
+
 }

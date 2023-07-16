@@ -9,28 +9,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description TODO
+ * @date 2023/2/24 15:13
+ */
 @Slf4j
-@Controller // 返回的字符串
+@Controller
 public class WxLoginController {
-    
+
     @Autowired
     WxAuthService wxAuthService;
 
     @RequestMapping("/wxLogin")
     public String wxLogin(String code, String state) throws IOException {
-        log.debug("微信扫码回调,code:{},state:{}",code,state);
-        // 微信给授权码
-        // 请求微信申请令牌，拿到令牌查询用户信息，将用户信息写入本项目数据库
-        // 远程调用 @TODO
+        log.debug("微信扫码回调,code:{},state:{}", code, state);
+        //远程调用微信请令牌，拿到令牌查询用户信息，将用户信息写入本项目数据库
         XcUser xcUser = wxAuthService.wxAuth(code);
 
-//        XcUser xcUser = new XcUser();
-//        //暂时硬编写，目的是调试环境
-//        xcUser.setUsername("t1");
-        if(xcUser==null){
+        if (xcUser == null) {
             return "redirect:http://www.51xuecheng.cn/error.html";
         }
         String username = xcUser.getUsername();
-        return "redirect:http://www.51xuecheng.cn/sign.html?username="+username+"&authType=wx";
+        return "redirect:http://www.51xuecheng.cn/sign.html?username=" + username + "&authType=wx";
     }
 }

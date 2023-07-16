@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * @description 课程预览，发布
  * @author Mr.M
- * @date 2022/9/16 14:48
  * @version 1.0
+ * @description TODO
+ * @date 2023/2/21 9:28
  */
 @Controller
 public class CoursePublishController {
@@ -23,21 +23,23 @@ public class CoursePublishController {
     @Autowired
     CoursePublishService coursePublishService;
 
-    @GetMapping("/coursepreview/{courseId}")
-    public ModelAndView preview(@PathVariable("courseId") Long courseId){
 
-        //获取课程预览信息
-        CoursePreviewDto coursePreviewInfo = coursePublishService.getCoursePreviewInfo(courseId);
+    @GetMapping("/coursepreview/{courseId}")
+    public ModelAndView preview(@PathVariable("courseId") Long courseId) {
 
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("model",coursePreviewInfo);
-        modelAndView.setViewName("course_template");
+        //查询课程的信息作为模型数据
+        CoursePreviewDto coursePreviewInfo = coursePublishService.getCoursePreviewInfo(courseId);
+        //指定模型
+        modelAndView.addObject("model", coursePreviewInfo);
+        //指定模板
+        modelAndView.setViewName("course_template");//根据视图名称加.ftl找到模板
         return modelAndView;
     }
 
     @ResponseBody
     @PostMapping("/courseaudit/commit/{courseId}")
-    public void commitAudit(@PathVariable("courseId") Long courseId){
+    public void commitAudit(@PathVariable("courseId") Long courseId) {
         Long companyId = 1232141425L;
         coursePublishService.commitAudit(companyId, courseId);
     }
@@ -48,11 +50,7 @@ public class CoursePublishController {
     public void coursepublish(@PathVariable("courseId") Long courseId){
         Long companyId = 1232141425L;
         coursePublishService.publish(companyId,courseId);
-
     }
 
 
-
-
 }
-

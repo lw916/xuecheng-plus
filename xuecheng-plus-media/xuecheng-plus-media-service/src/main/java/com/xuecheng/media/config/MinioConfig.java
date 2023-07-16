@@ -11,16 +11,16 @@ import org.springframework.context.annotation.Configuration;
  * @description TODO
  * @date 2023/2/17 15:00
  */
-@Configuration // 必须的
+@Configuration
 public class MinioConfig {
- @Value("${minio.endpoint}") // 从Nacos中读取配置，注意路径
+ @Value("${minio.endpoint}")
  private String endpoint;
  @Value("${minio.accessKey}")
  private String accessKey;
  @Value("${minio.secretKey}")
  private String secretKey;
 
- @Bean // 对象要放到Springboot中要加@Bean注解
+ @Bean
  public MinioClient minioClient() {
 
   MinioClient minioClient =

@@ -7,12 +7,11 @@ import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
-import io.minio.errors.*;
+import io.minio.UploadObjectArgs;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /**
  * @description 媒资文件管理业务类
@@ -21,6 +20,9 @@ import java.security.NoSuchAlgorithmException;
  * @version 1.0
  */
 public interface MediaFileService {
+
+ //根据媒资id查询文件信息
+ MediaFiles getFileById(String mediaId);
 
  /**
   * @description 媒资文件查询方法
@@ -37,12 +39,22 @@ public interface MediaFileService {
   * @param companyId 机构id
   * @param uploadFileParamsDto 文件信息
   * @param localFilePath 文件本地路径
-  * @param objectName 如果传入则用ObjectName，没有则默认方法
+  * @param objectname 如果传入objectname要按objectname的目录去存储，如果不传就按年月日目录结构去存储
   * @return UploadFileResultDto
   */
- public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName);
+ public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath,String objectname);
 
  public MediaFiles addMediaFilesToDb(Long companyId,String fileMd5,UploadFileParamsDto uploadFileParamsDto,String bucket,String objectName);
+
+ /**
+  * 将文件上传到minio
+  * @param localFilePath 文件本地路径
+  * @param mimeType 媒体类型
+  * @param bucket 桶
+  * @param objectName 对象名
+  * @return
+  */
+ public boolean addMediaFilesToMinIO(String localFilePath,String mimeType,String bucket, String objectName);
 
  /**
   * @description 检查文件是否存在
@@ -51,7 +63,7 @@ public interface MediaFileService {
   * @author Mr.M
   * @date 2022/9/13 15:38
   */
- public RestResponse<Boolean> checkFile(String fileMd5) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+ public RestResponse<Boolean> checkFile(String fileMd5);
 
  /**
   * @description 检查分块是否存在
@@ -74,6 +86,7 @@ public interface MediaFileService {
   */
  public RestResponse uploadChunk(String fileMd5,int chunk,String localChunkFilePath);
 
+
  /**
   * @description 合并分块
   * @param companyId  机构id
@@ -93,21 +106,4 @@ public interface MediaFileService {
   * @return 下载后的文件
   */
  public File downloadFileFromMinIO(String bucket, String objectName);
-
- /**
-  * 将文件上传到minio
-  *
-  * @param localFilePath 文件本地路径
-  * @param mimeType      媒体类型
-  * @param bucket        桶
-  * @param objectName    对象名
-  * @return
-  */
- public boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
-
-
- // 根据媒资id查询文件信息
- public MediaFiles getFileById(String mediaId);
-
-
 }

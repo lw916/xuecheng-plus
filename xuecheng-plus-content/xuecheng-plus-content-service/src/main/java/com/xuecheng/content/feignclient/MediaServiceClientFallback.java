@@ -4,15 +4,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description TODO
+ * @date 2023/2/22 11:06
+ */
 public class MediaServiceClientFallback implements MediaServiceClient{
+ @Override
+ public String upload(MultipartFile filedata, String objectName) throws IOException {
 
-    // fallback 让服务不可用的情况下跳到该备份办法
-    // 但不知道为什么会出错， 无法拿到熔断异常
-
-    @Override
-    public String upload(MultipartFile filedata, String objectName) throws IOException {
-
-        return null;
-    }
-
+  return null;
+ }
 }

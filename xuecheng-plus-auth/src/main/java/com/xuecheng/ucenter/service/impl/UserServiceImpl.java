@@ -15,65 +15,68 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description TODO
+ * @date 2023/2/24 10:37
+ */
 @Slf4j
 @Component
 public class UserServiceImpl implements UserDetailsService {
-
     @Autowired
     XcUserMapper xcUserMapper;
 
     @Autowired
-    ApplicationContext applicationContext; // 注入Spring容器
+    ApplicationContext applicationContext;
 
-    // 传入的请求认证的参数是AuthParamsDto
+
+
+    //传入的请求认证的参数就是AuthParamsDto
     @Override
-    // 重写userDetail去数据库拿用户名和密码
-    public UserDetails loadUserByUsername(String str) throws UsernameNotFoundException{
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        //将传入的json转成AuthParamsDto对象
         AuthParamsDto authParamsDto = null;
-        // 将传入的jsonchuan转为AuthParamsDto
-        try{
-            authParamsDto = JSON.parseObject(str, AuthParamsDto.class);
-        }catch (Exception e){
-            throw new RuntimeException("请求认证的参数不符合");
+        try {
+            authParamsDto = JSON.parseObject(s, AuthParamsDto.class);
+        } catch (Exception e) {
+            throw new RuntimeException("请求认证参数不符合要求");
         }
-        // 获取认证方式
-        /**
-         * @description 该方法用于确认使用什么方法去认证 统一认证
-         */
+
+        //认证类型，有password，wx。。。
         String authType = authParamsDto.getAuthType();
-        // 根据认证方式从Spring容器中取出指定Bean
-        String beanName = authType + "_authservice";
-        AuthService authService = applicationContext.getBean(beanName, AuthService.class);// @Todo 理解下
-        // 调用方法
+
+
+        //根据认证类型从spring容器取出指定的bean
+        String beanName = authType+"_authservice";
+        AuthService authService = applicationContext.getBean(beanName, AuthService.class);
+        //调用统一execute方法完成认证
         XcUserExt xcUserExt = authService.execute(authParamsDto);
-        // 分装用户数据为UserDetails
-        // 查到了则匹配用户密码，最终封装成UserDetails放出
-        return this.getUserPrincipal(xcUserExt);
+        //封装xcUserExt用户信息为UserDetails
+
+        UserDetails userPrincipal = getUserPrincipal(xcUserExt);
+
+        return userPrincipal;
     }
 
-    // 从用户表获取用户的信息
     /**
      * @description 查询用户信息
-     * @param user  用户id，主键
+     * @param xcUser  用户id，主键
      * @return com.xuecheng.ucenter.model.po.XcUser 用户信息
      * @author Mr.M
      * @date 2022/9/29 12:19
      */
-    public UserDetails getUserPrincipal(XcUserExt user){
-        //用户权限,如果不加报Cannot pass a null GrantedAuthority collection
-        String[] authorities = {"p1"};
-        String password = user.getPassword();
-        //为了安全在令牌中不放密码
-        user.setPassword(null);
-        //将user对象转json
-        String userString = JSON.toJSONString(user);
-        //创建UserDetails对象
-        return User.withUsername(userString).password(password).authorities(authorities).build();
+    public UserDetails getUserPrincipal(XcUserExt xcUser){
+        String password = xcUser.getPassword();
+        //权限
+        String[] authorities=  {"test"};
+        xcUser.setPassword(null);
+        //将用户信息转json
+        String userJson = JSON.toJSONString(xcUser);
+        UserDetails userDetails = User.withUsername(userJson).password(password).authorities(authorities).build();
+        return  userDetails;
     }
-
-
 
 
 }

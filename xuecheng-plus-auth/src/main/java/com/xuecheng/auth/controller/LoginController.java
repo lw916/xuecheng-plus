@@ -37,13 +37,13 @@ public class LoginController {
     }
 
     @RequestMapping("/r/r1")
-    @PreAuthorize("hasAnyAuthority('p1')")
+    @PreAuthorize("hasAuthority('p1')")//拥有p1权限方可访问
     public String r1() {
         return "访问r1资源";
     }
 
     @RequestMapping("/r/r2")
-    @PreAuthorize("hasAnyAuthority('p2')")
+    @PreAuthorize("hasAuthority('p2')")//拥有p2权限方可访问
     public String r2() {
         return "访问r2资源";
     }

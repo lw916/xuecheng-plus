@@ -1,6 +1,0 @@
-### 申请验证码
-POST {{checkcode_host}}/checkcode/pic
-
-### 校验验证码
-POST {{checkcode_host}}/checkcode/verify?key=checkcode:392820ac20da4f86adab65ab2df603e6&code=fvdn
-

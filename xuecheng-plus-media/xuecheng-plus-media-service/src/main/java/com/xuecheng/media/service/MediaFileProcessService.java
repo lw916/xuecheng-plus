@@ -4,7 +4,14 @@ import com.xuecheng.media.model.po.MediaProcess;
 
 import java.util.List;
 
+/**
+ * @author Mr.M
+ * @version 1.0
+ * @description 任务处理
+ * @date 2023/2/19 10:43
+ */
 public interface MediaFileProcessService {
+
     /**
      * @description 获取待处理任务
      * @param shardIndex 分片序号
@@ -23,6 +30,7 @@ public interface MediaFileProcessService {
      */
     public boolean startTask(long id);
 
+
     /**
      * @description 保存任务结果
      * @param taskId  任务id
@@ -35,5 +43,6 @@ public interface MediaFileProcessService {
      * @date 2022/10/15 11:29
      */
     void saveProcessFinishStatus(Long taskId,String status,String fileId,String url,String errorMsg);
+
 
 }

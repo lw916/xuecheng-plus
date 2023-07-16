@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface CourseCategoryMapper extends BaseMapper<CourseCategory> {
 
-    // 自定义Mapper方法查询Category
+    //使用递归查询分类
     public List<CourseCategoryTreeDto> selectTreeNodes(String id);
 
 }

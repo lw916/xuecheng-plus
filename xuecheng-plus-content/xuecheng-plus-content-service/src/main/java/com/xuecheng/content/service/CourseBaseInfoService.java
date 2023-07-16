@@ -9,53 +9,42 @@ import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 
 /**
- *
- * @author Wayne
+ * @author Mr.M
+ * @version 1.0
  * @description 课程信息管理接口
- * @date 2023/6/24
+ * @date 2023/2/12 10:14
  */
-
 public interface CourseBaseInfoService {
 
-
     /**
-     * @description 带分页功能的请求课程列表接口
+     * 课程分页查询
      * @param pageParams 分页查询参数
-     * @param queryCourseParamsDto 查询条件参数
-     * @return 返回的查询结果
+     * @param courseParamsDto 查询条件
+     * @return 查询结果
      */
-    // 课程分页查询
-    // 它由API调用，所以返回的内容要给API接口使用
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParamsDto);
+    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto courseParamsDto);
 
     /**
-     * @description 创建课程接口
-     * @param companyId 单点登录后获取机构id
-     * @param addCourseDto 增加课程信息
+     * 新增课程
+     * @param companyId 机构id
+     * @param addCourseDto 课程信息
      * @return 课程详细信息
      */
-    // 新增课程
-    public CourseBaseInfoDto createCourseBase(Long companyId, AddCourseDto addCourseDto);
-
+    public CourseBaseInfoDto createCourseBase(Long companyId,AddCourseDto addCourseDto);
 
     /**
-     * @description 获取课程信息接口
+     * 根据课程id查询课程信息
      * @param courseId 课程id
-     * @return 课程的所有信息
+     * @return 课程详细信息
      */
-    public CourseBaseInfoDto getCourseBaseById(Long courseId);
+    public CourseBaseInfoDto getCourseBaseInfo(Long courseId);
 
     /**
-     * @description 修改课程基本信息接口
-     * @param companyId 来自的机构id,来源是单点登录
-     * @param editCourseDto 课程信息dto
-     * @return
+     * 修改课程
+     * @param companyId 机构id
+     * @param editCourseDto 修改课程信息
+     * @return 课程详细信息
      */
-    public CourseBaseInfoDto updateCourseBaseById(Long companyId, EditCourseDto editCourseDto);
+    public CourseBaseInfoDto updateCourseBase(Long companyId,EditCourseDto editCourseDto);
 
-    /**
-     * @description 删除课程
-     * @param courseId
-     */
-    public void deleteCourse(Long courseId, Long companyId);
 }

@@ -31,7 +31,6 @@ public class UserServiceImpl implements UserDetailsService {
     @Override
     // 重写userDetail去数据库拿用户名和密码
     public UserDetails loadUserByUsername(String str) throws UsernameNotFoundException{
-
         AuthParamsDto authParamsDto = null;
         // 将传入的jsonchuan转为AuthParamsDto
         try{

@@ -23,4 +23,13 @@ public class AuthApplication {
         SpringApplication.run(AuthApplication.class, args);
     }
 
+    @Bean
+    // 远程调用 使用restTemplate
+    // @Todo 看看啥是RestTemplate
+    RestTemplate restTemplate(){
+        RestTemplate restTemplate = new RestTemplate(new OkHttp3ClientHttpRequestFactory());
+        return restTemplate;
+    }
+
+
 }

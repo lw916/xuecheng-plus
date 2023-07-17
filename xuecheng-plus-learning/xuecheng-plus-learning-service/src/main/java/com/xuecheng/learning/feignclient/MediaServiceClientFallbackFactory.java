@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MediaServiceClientFallbackFactory implements FallbackFactory<MediaServiceClient> {
     @Override
+    // 调用媒资失败的降级类
     public MediaServiceClient create(Throwable throwable) {
         return new MediaServiceClient() {
             @Override

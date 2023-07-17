@@ -147,6 +147,10 @@ public class OrderServiceImpl implements OrderService {
         if (payRecord == null) {
             XueChengPlusException.cast("支付记录找不到");
         }
+        // 如果支付成功了就不要再走了
+        if(payRecord.getStatus().equals("601002")){
+            return;
+        }
         //支付结果
         String trade_status = payStatusDto.getTrade_status();
         log.debug("收到支付结果:{},支付记录:{}}", payStatusDto.toString(),payRecord.toString());
@@ -193,6 +197,7 @@ public class OrderServiceImpl implements OrderService {
                 XueChengPlusException.cast("更新订单表状态失败");
             }
             //保存消息记录,参数1：支付结果通知类型，2: 业务id，3:业务类型
+            // 订单信息整完了再发消息
             MqMessage mqMessage = mqMessageService.addMessage("payresult_notify", orders.getOutBusinessId(), orders.getOrderType(), null);
             // 通知消息 调用RabbitMq去广播消息
             // @Todo Tips: 将订单支付信息异步给其他微服务
@@ -219,6 +224,7 @@ public class OrderServiceImpl implements OrderService {
                         // 3.1.ack，消息成功
                         log.debug("通知支付结果消息发送成功, ID:{}", correlationData.getId());
                         //删除消息表中的记录 消息ID
+                        //@TODO 发送消息完成，从数据库中删除数据
                         mqMessageService.completed(message.getId());
                     }else{
                         // 3.2.nack，消息失败

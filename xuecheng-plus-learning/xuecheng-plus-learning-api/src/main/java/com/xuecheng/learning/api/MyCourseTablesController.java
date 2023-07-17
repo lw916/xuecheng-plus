@@ -32,7 +32,6 @@ public class MyCourseTablesController {
     @Autowired
     MyCourseTableService myCourseTableService;
 
-
     @ApiOperation("添加选课")
     @PostMapping("/choosecourse/{courseId}")
     public XcChooseCourseDto addChooseCourse(@PathVariable("courseId") Long courseId) {
@@ -45,7 +44,6 @@ public class MyCourseTablesController {
 
         //添加选课
         XcChooseCourseDto xcChooseCourseDto = myCourseTableService.addChooseCourse(userId, courseId);
-
         return xcChooseCourseDto;
     }
 

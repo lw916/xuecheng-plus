@@ -1,4 +1,4 @@
-package com.xuecheng.orders.service;
+package com.xuecheng.orders.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -11,7 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.utils.IdWorkerUtils;
 import com.xuecheng.base.utils.QRCodeUtil;
+import com.xuecheng.messagesdk.model.po.MqMessage;
+import com.xuecheng.messagesdk.service.MqMessageService;
 import com.xuecheng.orders.config.AlipayConfig;
+import com.xuecheng.orders.config.PayNotifyConfig;
 import com.xuecheng.orders.mapper.XcOrdersGoodsMapper;
 import com.xuecheng.orders.mapper.XcOrdersMapper;
 import com.xuecheng.orders.mapper.XcPayRecordMapper;
@@ -21,7 +24,13 @@ import com.xuecheng.orders.model.dto.PayStatusDto;
 import com.xuecheng.orders.model.po.XcOrders;
 import com.xuecheng.orders.model.po.XcOrdersGoods;
 import com.xuecheng.orders.model.po.XcPayRecord;
+import com.xuecheng.orders.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,13 +38,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
     @Autowired
     XcOrdersMapper ordersMapper;
 
@@ -47,6 +57,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     OrderServiceImpl currentProxy;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    MqMessageService mqMessageService;
 
     @Value("${pay.alipay.APP_ID}")
     String APP_ID;
@@ -176,8 +192,43 @@ public class OrderServiceImpl implements OrderService{
                 log.info("更新订单表状态失败,订单号:{}", orderId);
                 XueChengPlusException.cast("更新订单表状态失败");
             }
+            //保存消息记录,参数1：支付结果通知类型，2: 业务id，3:业务类型
+            MqMessage mqMessage = mqMessageService.addMessage("payresult_notify", orders.getOutBusinessId(), orders.getOrderType(), null);
+            // 通知消息 调用RabbitMq去广播消息
+            // @Todo Tips: 将订单支付信息异步给其他微服务
+            notifyPayResult(mqMessage);
         }
 
+    }
+
+    @Override
+    // 自动发消息到消息队列
+    public void notifyPayResult(MqMessage message) {
+        //1、消息体，转json
+        String msg = JSON.toJSONString(message);
+        //设置消息持久化
+        Message msgObj = MessageBuilder.withBody(msg.getBytes(StandardCharsets.UTF_8))
+                .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
+                .build();
+        // 2.全局唯一的消息ID，需要封装到CorrelationData中
+        CorrelationData correlationData = new CorrelationData(message.getId().toString());
+        // 3.添加callback 发送消息队列异常了
+        correlationData.getFuture().addCallback(
+                result -> {
+                    if(result.isAck()){
+                        // 3.1.ack，消息成功
+                        log.debug("通知支付结果消息发送成功, ID:{}", correlationData.getId());
+                        //删除消息表中的记录 消息ID
+                        mqMessageService.completed(message.getId());
+                    }else{
+                        // 3.2.nack，消息失败
+                        log.error("通知支付结果消息发送失败, ID:{}, 原因{}",correlationData.getId(), result.getReason());
+                    }
+                },
+                ex -> log.error("消息发送异常, ID:{}, 原因{}",correlationData.getId(),ex.getMessage())
+        );
+        // 发送消息 广播消息
+        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", msgObj,correlationData);
     }
 
     @Transactional

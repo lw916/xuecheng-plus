@@ -63,7 +63,12 @@ public class MyCourseTablesController {
     @ApiOperation("我的课程表")
     @GetMapping("/mycoursetable")
     public PageResult<XcCourseTables> mycoursetable(MyCourseTableParams params) {
-        return null;
+
+        PageResult<XcCourseTables> mycourestabls = myCourseTableService.mycourestabls(params);
+        if(mycourestabls == null){
+            XueChengPlusException.cast("查询个人课表失败");
+        }
+        return mycourestabls;
     }
 
 }

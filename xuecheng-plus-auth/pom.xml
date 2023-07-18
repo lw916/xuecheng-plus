@@ -11,6 +11,7 @@
     <artifactId>xuecheng-plus-auth</artifactId>
 
 
+
     <dependencies>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -97,6 +98,25 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 
 
 </project>

@@ -64,7 +64,7 @@ public class CoursePublishController {
     @GetMapping("/r/coursepublish/{courseId}") // url带r是为了避开权限验证，内部接口访问
     public CoursePublish getCoursepublish(@PathVariable("courseId") Long courseId) {
         // 查询课程发布信息
-        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        CoursePublish coursePublish = coursePublishService.getCoursePublishCache(courseId);
         return coursePublish;
     }
 
@@ -73,7 +73,7 @@ public class CoursePublishController {
     @GetMapping("/course/whole/{courseId}")
     public CoursePreviewDto getCoursePublish(@PathVariable("courseId") Long courseId) {
         //查询课程发布信息
-        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        CoursePublish coursePublish = coursePublishService.getCoursePublishCache(courseId);
         if (coursePublish == null) {
             return new CoursePreviewDto();
         }

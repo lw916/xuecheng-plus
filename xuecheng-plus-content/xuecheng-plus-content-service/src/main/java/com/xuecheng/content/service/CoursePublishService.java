@@ -62,4 +62,6 @@ public interface CoursePublishService {
  // 根据课程ID获取课程信息
  public CoursePublish getCoursePublish(Long courseId);
 
+ public CoursePublish getCoursePublishCache(Long courseId);
+
 }
